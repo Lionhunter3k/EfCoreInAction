@@ -11,22 +11,24 @@ using Microsoft.Extensions.Logging;
 
 namespace MyFirstEfCoreApp
 {
-    public static class Commands
+    public class Commands
     {
+        private readonly AppDbContext db;
 
-
-        public static void ListAll()
+        public Commands(AppDbContext appContext)
         {
-            using (var db = new AppDbContext())              //#A
+            this.db = appContext;
+        }
+
+        public void ListAll()
+        {
+            foreach (var book in db.Books.AsNoTracking() //#B
+                  .Include(a => a.Author))                 //#C
             {
-                foreach (var book in db.Books.AsNoTracking() //#B
-                    .Include(a => a.Author))                 //#C
-                {
-                    var webUrl = book.Author.WebUrl ?? "- no web url given -";
-                    Console.WriteLine($"{book.Title} by {book.Author.Name}");
-                    Console.WriteLine("     Published on " +
-                        $"{book.PublishedOn:dd-MMM-yyyy}. {webUrl}");
-                }
+                var webUrl = book.Author.WebUrl ?? "- no web url given -";
+                Console.WriteLine($"{book.Title} by {book.Author.Name}");
+                Console.WriteLine("     Published on " +
+                    $"{book.PublishedOn:dd-MMM-yyyy}. {webUrl}");
             }
         }
         /**************************************************************
@@ -35,21 +37,18 @@ namespace MyFirstEfCoreApp
         #C The include causes the Author information to be ‘eagerly’ loaded with each book. See chapter 2 for more on this
          * *************************************************************/
 
-        public static void ChangeWebUrl()
+        public void ChangeWebUrl()
         {
             Console.Write("New Quantum Networking WebUrl > ");
             var newWebUrl = Console.ReadLine();                   //#A
 
-            using (var db = new AppDbContext())
-            {
-                var book = db.Books
-                    .Include(a => a.Author)                        //#B
-                    .Single(b => b.Title == "Quantum Networking"); //#C
+            var book = db.Books
+                     .Include(a => a.Author)                        //#B
+                     .Single(b => b.Title == "Quantum Networking"); //#C
 
-                book.Author.WebUrl = newWebUrl;                    //#D
-                db.SaveChanges();                                  //#E
-                Console.WriteLine("... SavedChanges called.");
-            }
+            book.Author.WebUrl = newWebUrl;                    //#D
+            db.SaveChanges();                                  //#E
+            Console.WriteLine("... SavedChanges called.");
 
             ListAll();                                             //#F
         }
@@ -63,28 +62,25 @@ namespace MyFirstEfCoreApp
 
          * ************************************************************/
 
-        public static void ListAllWithLogs()
+        public void ListAllWithLogs()
         {
             var logs = new List<string>();
-            using (var db = new AppDbContext())
-            {
-                var serviceProvider = db.GetInfrastructure();
-                var loggerFactory = (ILoggerFactory)serviceProvider.GetService(typeof(ILoggerFactory));
-                loggerFactory.AddProvider(new MyLoggerProvider(logs));
+            var serviceProvider = db.GetInfrastructure();
+            var loggerFactory = (ILoggerFactory)serviceProvider.GetService(typeof(ILoggerFactory));
+            loggerFactory.AddProvider(new MyLoggerProvider(logs));
 
-                foreach (var book in
-                    db.Books.AsNoTracking()
-                    .Include(a => a.Author))
-                {
-                    var webUrl = book.Author.WebUrl == null
-                        ? "- no web url given -"
-                        : book.Author.WebUrl;
-                    Console.WriteLine(
-                        $"{book.Title} by {book.Author.Name}");
-                    Console.WriteLine("     " +
-                        $"Published on {book.PublishedOn:dd-MMM-yyyy}" +
-                        $". {webUrl}");
-                }
+            foreach (var book in
+                db.Books.AsNoTracking()
+                .Include(a => a.Author))
+            {
+                var webUrl = book.Author.WebUrl == null
+                    ? "- no web url given -"
+                    : book.Author.WebUrl;
+                Console.WriteLine(
+                    $"{book.Title} by {book.Author.Name}");
+                Console.WriteLine("     " +
+                    $"Published on {book.PublishedOn:dd-MMM-yyyy}" +
+                    $". {webUrl}");
             }
             Console.WriteLine("---------- LOGS ------------------");
             foreach (var log in logs)
@@ -93,25 +89,22 @@ namespace MyFirstEfCoreApp
             }
         }
 
-        public static void ChangeWebUrlWithLogs()
+        public void ChangeWebUrlWithLogs()
         {
             var logs = new List<string>();
             Console.Write("New Quantum Networking WebUrl > ");
             var newWebUrl = Console.ReadLine();
 
-            using (var db = new AppDbContext())
-            {
-                var serviceProvider = db.GetInfrastructure();
-                var loggerFactory = (ILoggerFactory)serviceProvider.GetService(typeof(ILoggerFactory));
-                loggerFactory.AddProvider(new MyLoggerProvider(logs));
+            var serviceProvider = db.GetInfrastructure();
+            var loggerFactory = (ILoggerFactory)serviceProvider.GetService(typeof(ILoggerFactory));
+            loggerFactory.AddProvider(new MyLoggerProvider(logs));
 
-                var book = db.Books
-                    .Include(a => a.Author)
-                    .Single(b => b.Title == "Quantum Networking");
-                book.Author.WebUrl = newWebUrl;
-                db.SaveChanges();
-                Console.Write("... SavedChanges called.");
-            }
+            var book = db.Books
+                .Include(a => a.Author)
+                .Single(b => b.Title == "Quantum Networking");
+            book.Author.WebUrl = newWebUrl;
+            db.SaveChanges();
+            Console.Write("... SavedChanges called.");
             Console.WriteLine("---------- LOGS ------------------");
             foreach (var log in logs)
             {
@@ -124,25 +117,27 @@ namespace MyFirstEfCoreApp
         /// </summary>
         /// <param name="onlyIfNoDatabase">If true it will not do anything if the database exists</param>
         /// <returns>returns true if database database was created</returns>
-        public static bool WipeCreateSeed(bool onlyIfNoDatabase)
+        public bool WipeCreateSeed(bool onlyIfNoDatabase)
         {
-            using (var db = new AppDbContext())
-            {
-                if (onlyIfNoDatabase && (db.GetService<IDatabaseCreator>() as RelationalDatabaseCreator).Exists())
-                    return false;
+            if (onlyIfNoDatabase && (db.GetService<IDatabaseCreator>() as RelationalDatabaseCreator).Exists())
+                return false;
 
-                db.Database.EnsureDeleted();
-                db.Database.EnsureCreated();
-                if (!db.Books.Any())
-                {
-                    WriteTestData(db);
-                    Console.WriteLine("Seeded database");
-                }
+            db.Database.EnsureDeleted();
+            db.Database.EnsureCreated();
+            if (!db.Books.Any())
+            {
+                WriteTestData(db);
+                Console.WriteLine("Seeded database");
             }
             return true;
         }
 
-        public static void WriteTestData(this AppDbContext db)
+        public void GetSchemaSql()
+        {
+            Console.WriteLine((db.GetService<IDatabaseCreator>() as RelationalDatabaseCreator).GenerateCreateScript());
+        }
+
+        public void WriteTestData(AppDbContext db)
         {
             var martinFowler = new Author
             {
