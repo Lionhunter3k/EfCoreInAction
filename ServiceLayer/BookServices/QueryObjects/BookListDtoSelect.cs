@@ -31,7 +31,7 @@ namespace ServiceLayer.BookServices.QueryObjects
                 ReviewsCount = p.Reviews.Count,           //#F
                 ReviewsAverageVotes =                  //#G
                     p.Reviews.Select(y =>              //#G
-                        (double?)y.NumStars).Average() //#G
+                        (decimal?)y.NumStars).Average() //#G
 
             });
         }

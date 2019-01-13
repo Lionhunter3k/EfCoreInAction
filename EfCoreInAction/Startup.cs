@@ -38,14 +38,15 @@ namespace EfCoreInAction
             //This makes the Git branch name available via injection
             services.AddSingleton(new AppInformation(gitBranchName));
 
-            var connection = Configuration.GetConnectionString("DefaultConnection");
+            var connection = Configuration.GetConnectionString("MySql");
             if (Configuration["ENVIRONMENT"]== "Development")
             {
                 //if running in development mode then we alter the connection to have the branch name in it
-                connection = connection.FormDatabaseConnection(gitBranchName);
+                //connection = connection.FormDatabaseConnection(gitBranchName);
+                connection = string.Format(connection, gitBranchName);
             }
-            services.AddDbContext<EfCoreContext>(options => options.UseSqlServer(connection,
-                b => b.MigrationsAssembly("DataLayer")));
+            services.AddDbContext<EfCoreContext>(options => options.UseMySql(connection,
+                b => b.MigrationsAssembly("DataLayer.Migrations")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

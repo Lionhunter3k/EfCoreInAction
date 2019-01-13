@@ -53,3 +53,12 @@ namespace DataLayer.EfCode
 * b) Delete all the class in the Migration directory
 * c) follow the steps to add a migration
 ******************************************************************************/
+
+/*
+ * For database specific migration, use the following command:
+ * Add-Migration InitialDb -Context MySqlContext -Project DataLayer.Migrations -StartupProject EfCoreInAction -OutputDir 20190113
+ * OR
+ * if i want to externalize EF configuration, i can define the design context factory in the startup project and use
+ * the following command:
+ * Add-Migration AuthorChanges_RevertToOriginal -Project DataLayer.Migrations -StartupProject EfCoreInAction
+*/

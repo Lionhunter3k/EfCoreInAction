@@ -3,6 +3,7 @@ using System.IO;
 using DataLayer.EfCode;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ServiceLayer.DatabaseServices.Concrete;
@@ -36,7 +37,7 @@ namespace EfCoreInAction
                         var logger = services.GetRequiredService<ILogger<Program>>();
                         logger.LogError(ex, "An error occurred while migrating the database.");
                     }
-                    try
+                    try 
                     {
                         context.SeedDatabase(GetWwwRootPath());
                     }
@@ -61,6 +62,30 @@ namespace EfCoreInAction
                     try
                     {
                         context.DevelopmentEnsureCreated();
+                        context.SeedDatabase(GetWwwRootPath());
+                    }
+                    catch (Exception ex)
+                    {
+                        var logger = services.GetRequiredService<ILogger<Program>>();
+                        logger.LogError(ex, "An error occurred while setting upor seeding the development database.");
+                    }
+                }
+            }
+
+            return webHost;
+        }
+
+        public static IWebHost SetupDatabaseSchema(this IWebHost webHost)
+        {
+            using (var scope = webHost.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                using (var context = services.GetRequiredService<EfCoreContext>())
+                {
+                    try
+                    {
+                        var dbCreator = services.GetRequiredService<IRelationalDatabaseCreator>();
+                        dbCreator.CreateTables();
                         context.SeedDatabase(GetWwwRootPath());
                     }
                     catch (Exception ex)

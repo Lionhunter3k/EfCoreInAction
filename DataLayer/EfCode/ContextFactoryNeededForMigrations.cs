@@ -14,18 +14,18 @@ namespace DataLayer.EfCode
     /// but it is Ok on a local machine, which is where you want to run the command
     /// see https://docs.microsoft.com/en-us/ef/core/miscellaneous/configuring-dbcontext#using-idesigntimedbcontextfactorytcontext
     /// </summary>
-    public class ContextFactoryNeededForMigrations : IDesignTimeDbContextFactory<EfCoreContext>
-    {
-        private const string ConnectionString =
-            "Server=(localdb)\\mssqllocaldb;Database=EfCoreInActionDb;Trusted_Connection=True;MultipleActiveResultSets=true";
+    //public class ContextFactoryNeededForMigrations : IDesignTimeDbContextFactory<EfCoreContext>
+    //{
+    //    private const string ConnectionString =
+    //        "Server=(localdb)\\mssqllocaldb;Database=EfCoreInActionDb;Trusted_Connection=True;MultipleActiveResultSets=true";
 
-        public EfCoreContext CreateDbContext(string[] args)
-        {
-            var optionsBuilder = new DbContextOptionsBuilder<EfCoreContext>();
-            optionsBuilder.UseSqlServer(ConnectionString,
-                b => b.MigrationsAssembly("DataLayer"));
+    //    public EfCoreContext CreateDbContext(string[] args)
+    //    {
+    //        var optionsBuilder = new DbContextOptionsBuilder<EfCoreContext>();
+    //        optionsBuilder.UseSqlServer(ConnectionString,
+    //            b => b.MigrationsAssembly("DataLayer"));
 
-            return new EfCoreContext(optionsBuilder.Options);
-        }
-    }
+    //        return new EfCoreContext(optionsBuilder.Options);
+    //    }
+    //}
 }

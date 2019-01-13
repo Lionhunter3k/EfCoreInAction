@@ -1,7 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
-using System;
-using System.Collections.Generic;
 
 namespace DataLayer.Migrations
 {
@@ -13,9 +12,9 @@ namespace DataLayer.Migrations
                 name: "Authors",
                 columns: table => new
                 {
-                    AuthorId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    AuthorId = table.Column<int>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -26,15 +25,15 @@ namespace DataLayer.Migrations
                 name: "Books",
                 columns: table => new
                 {
-                    BookId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Price = table.Column<decimal>(type: "decimal(18, 2)", nullable: false),
-                    PublishedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Publisher = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    BookId = table.Column<int>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Title = table.Column<string>(nullable: true),
+                    Description = table.Column<string>(nullable: true),
+                    PublishedOn = table.Column<DateTime>(nullable: false),
+                    Publisher = table.Column<string>(nullable: true),
+                    Price = table.Column<decimal>(nullable: false),
+                    ImageUrl = table.Column<string>(nullable: true),
+                    SoftDeleted = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -45,9 +44,9 @@ namespace DataLayer.Migrations
                 name: "BookAuthor",
                 columns: table => new
                 {
-                    BookId = table.Column<int>(type: "int", nullable: false),
-                    AuthorId = table.Column<int>(type: "int", nullable: false),
-                    Order = table.Column<byte>(type: "tinyint", nullable: false)
+                    BookId = table.Column<int>(nullable: false),
+                    AuthorId = table.Column<int>(nullable: false),
+                    Order = table.Column<byte>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -70,11 +69,11 @@ namespace DataLayer.Migrations
                 name: "PriceOffers",
                 columns: table => new
                 {
-                    PriceOfferId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    BookId = table.Column<int>(type: "int", nullable: false),
-                    NewPrice = table.Column<decimal>(type: "decimal(18, 2)", nullable: false),
-                    PromotionalText = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    PriceOfferId = table.Column<int>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    NewPrice = table.Column<decimal>(nullable: false),
+                    PromotionalText = table.Column<string>(nullable: true),
+                    BookId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -91,12 +90,12 @@ namespace DataLayer.Migrations
                 name: "Review",
                 columns: table => new
                 {
-                    ReviewId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    BookId = table.Column<int>(type: "int", nullable: false),
-                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    NumStars = table.Column<int>(type: "int", nullable: false),
-                    VoterName = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    ReviewId = table.Column<int>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    VoterName = table.Column<string>(nullable: true),
+                    NumStars = table.Column<int>(nullable: false),
+                    Comment = table.Column<string>(nullable: true),
+                    BookId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {

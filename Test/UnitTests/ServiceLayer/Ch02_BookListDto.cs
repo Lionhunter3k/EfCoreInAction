@@ -59,7 +59,7 @@ namespace test.UnitTests.ServiceLayer
                     ReviewsAverageVotes =                  //#D
                         firstBook.Reviews.Count == 0       //#D
                             ? null                             //#D
-                            : (double?)firstBook.Reviews       //#D
+                            : (decimal?)firstBook.Reviews       //#D
                                 .Average(q => q.NumStars)          //#D
                 };
 
